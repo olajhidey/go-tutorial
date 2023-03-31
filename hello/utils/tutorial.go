@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -266,22 +267,56 @@ func RunFunctionTutorial() {
 	fmt.Println(result)
 }
 
-func displayCount(id int, letters... string){
+func displayCount(id int, letters ...string) {
 	count := 0
 
-	for range letters{
+	for range letters {
 		count++
 	}
 
 	fmt.Printf("%d - %d - %T - %s\n", id, count, letters, letters)
 }
 
-func RunVariadicFuncTutorial(){
+func RunVariadicFuncTutorial() {
+	displayCount(1, "c", "l", "o", "u", "d")
+	displayCount(2, "a", "c", "a", "d", "e", "m", "y")
 
-	displayCount(1, "c", "l","o","u","d")
-	displayCount(2,"a","c","a", "d","e","m","y")
-
-	cloud := []string{"d","e","v","o","p","s"}
+	cloud := []string{"d", "e", "v", "o", "p", "s"}
 	displayCount(3, cloud...)
+}
+
+func divide(num1 int, num2 int) (int, error) {
+	if num2 == 0 {
+		return 0, errors.New("Division by zero not allowed")
+	} else {
+		return (num1 / num2), nil
+	}
+}
+
+func RunFunctionWithMultipleValuesTutorial() {
+	if result, err := divide(10, 2); err != nil {
+		fmt.Print(err)
+	} else {
+		fmt.Print(result)
+	}
+}
+
+func extend(val string) func() string{
+	i:= 0
+	return func() string {
+		i++
+		return val[:i]
+	}
+}
+
+func RunFunctionAsAVariableTutorial() {
+
+	ca:= "cloudacademy"
+
+	word := extend(ca)
+
+	for i := 0; i < len(ca); i++ {
+		fmt.Println(word())
+	}
 
 }

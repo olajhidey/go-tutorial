@@ -26,5 +26,7 @@ func main() {
 
 	// utils.RunFunctionTutorial()
 
-	utils.RunVariadicFuncTutorial()
+	// utils.RunVariadicFuncTutorial()
+
+	utils.RunFunctionAsAVariableTutorial()
 }
