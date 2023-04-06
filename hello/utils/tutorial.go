@@ -3,6 +3,8 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"math"
+	"strings"
 )
 
 const Gpopulation int = 10000
@@ -301,8 +303,8 @@ func RunFunctionWithMultipleValuesTutorial() {
 	}
 }
 
-func extend(val string) func() string{
-	i:= 0
+func extend(val string) func() string {
+	i := 0
 	return func() string {
 		i++
 		return val[:i]
@@ -311,7 +313,7 @@ func extend(val string) func() string{
 
 func RunFunctionAsAVariableTutorial() {
 
-	ca:= "cloudacademy"
+	ca := "cloudacademy"
 
 	word := extend(ca)
 
@@ -319,4 +321,230 @@ func RunFunctionAsAVariableTutorial() {
 		fmt.Println(word())
 	}
 
+}
+
+type person struct {
+	firstname string
+	surname   string
+}
+
+type lecture struct {
+	name       string
+	instructor person
+	duration   int //seconds
+}
+
+func RunStructTutorial() {
+	lectures := []lecture{
+		{"Structs", person{"Jeremy", "Cook"}, 3000},
+		{"Pointers", person{"Jeremy", "Cook"}, 3000},
+		{"Functions", person{"Jeremy", "Cook"}, 3000},
+	}
+
+	for _, value := range lectures {
+		name := value.name
+		instructor := fmt.Sprintf("%s %s", value.instructor.firstname, value.instructor.surname)
+		duration := value.duration
+
+		fmt.Printf("Lecture: '%s', Author: %s, Duration: %d secs\n", name, instructor, duration)
+	}
+}
+
+func RunPointerHowTutorial() {
+	var num1 int = 100
+	var num2 int = 200
+
+	var str1 string = "blah"
+
+	var ptr1 *int = &num1
+
+	fmt.Printf("mem address of num1 is %p\n", &num1)
+	fmt.Printf("mem address of num2 is %p\n", &num2)
+	fmt.Printf("mem address of str1 is %p\n", &str1)
+
+	fmt.Printf("ptr1 points to mem address %p\n", ptr1)
+
+	*ptr1 = 101
+	fmt.Println(num1)
+
+	ptr1 = &num2
+	fmt.Printf("ptr1 points to mem address %p\n", ptr1)
+	fmt.Println(*ptr1)
+
+	ptr2 := new(int)
+	ptr2 = ptr1
+	fmt.Println(*ptr2)
+}
+
+func notString(msg string) {
+	msg = fmt.Sprintf("not%s", msg)
+}
+
+func notStringPtr(msg *string) {
+	*msg = fmt.Sprintf("not%s", *msg)
+}
+
+func RunPointerWhyTutorial() {
+	message := "cloudacademy"
+
+	notString(message)
+	fmt.Println(message)
+
+	notStringPtr(&message)
+	fmt.Println(message)
+}
+
+type user struct {
+	firstname string
+	surname   string
+	age       int
+}
+
+func (p *user) fullname() string {
+	return p.firstname + " " + p.surname
+}
+
+func (p *user) canDrive() bool {
+	if p.age >= 20 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (p *user) updateAge(newAge int) {
+	p.age = newAge
+}
+
+func RunStructFunction() {
+	person1 := user{"Ola", "Sam", 80}
+	person2 := user{"Jude", "Stark", 16}
+
+	fmt.Printf("%s can drive: %t\n", person1.fullname(), person1.canDrive())
+	fmt.Printf("%s can drive: %t\n", person2.fullname(), person2.canDrive())
+
+	person2.updateAge(person2.age + 4)
+	fmt.Println(person2.age)
+
+	fmt.Printf("%s can drive: %t\n", person2.fullname(), person2.canDrive())
+}
+
+type upstring string
+
+func (msg upstring) up() string {
+	s := string(msg)
+	return strings.ToUpper(s)
+}
+
+func RunNonStructFunctionsTutorial() {
+	message := upstring("Mint")
+	fmt.Println(message.up())
+}
+
+type device interface {
+	turnOn() string
+	turnOff() string
+}
+
+type iphone struct {
+	name  string
+	model string
+}
+
+type imac struct {
+	name  string
+	model string
+}
+
+func (phone iphone) turnOn() string {
+	return "iOS starting up..."
+}
+
+func (phone iphone) turnOff() string {
+	return "iOS shutting down..."
+}
+
+func (mac imac) turnOn() string {
+	return "macOS starting up..."
+}
+
+func (mac imac) turnOff() string {
+	return "macOS shutting down..."
+}
+
+func RunInterfaceTutorial() {
+	dev1 := iphone{"iPhone", "11"}
+	dev2 := imac{"iMac", "27 5K Retina"}
+
+	devices := []device{dev1, dev2}
+
+	for _, device := range devices {
+		fmt.Println(device.turnOff())
+	}
+}
+
+func circleArea(radius float32) (float32, error) {
+	if radius < 0 {
+		return 0, errors.New("Radius should be a positive value")
+	} else {
+		return math.Pi * radius * radius, nil
+	}
+}
+
+func RunErrorTutorial() {
+	area1, _ := circleArea(3)
+	fmt.Println(area1)
+
+	if area2, err := circleArea(2); err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(area2)
+	}
+}
+
+func doSomething(msg string) {
+	fmt.Println(msg)
+}
+
+func system() int {
+	fmt.Println("system started...")
+
+	defer doSomething("cleanup")
+	defer doSomething("stop")
+
+	fmt.Println("system finished!")
+
+	return 1
+
+}
+
+func RunDeferTutorial() {
+
+	data := system()
+	fmt.Println(data)
+
+}
+
+func system2() int {
+	fmt.Println("system started...")
+
+	defer func(msg string) {
+		if r := recover(); r != nil {
+			fmt.Println("recovered")
+		}
+	}("blah!")
+
+	var data []int
+	var x = data[0]
+	x++
+
+	fmt.Println("system finished")
+	return 1
+
+}
+
+func RunPanicRecoverTutorial() {
+	data := system2()
+	fmt.Println(data)
+	panic("die!")
 }

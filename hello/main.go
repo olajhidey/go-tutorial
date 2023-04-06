@@ -28,5 +28,13 @@ func main() {
 
 	// utils.RunVariadicFuncTutorial()
 
-	utils.RunFunctionAsAVariableTutorial()
+	// utils.RunFunctionAsAVariableTutorial()
+
+	// utils.RunPointerWhyTutorial()
+
+	// utils.RunStructFunction()
+
+	// utils.RunNonStructFunctionsTutorial()
+
+	utils.RunPanicRecoverTutorial()
 }
