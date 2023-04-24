@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 	"strings"
+	"time"
 )
 
 const Gpopulation int = 10000
@@ -547,4 +549,27 @@ func RunPanicRecoverTutorial() {
 	data := system2()
 	fmt.Println(data)
 	panic("die!")
+}
+
+func pause(){
+	rand.Seed(time.Now().UnixNano())
+	n := rand.Intn(3)
+	time.Sleep(time.Duration(n) * time.Second)
+}
+
+func doSomethingGoRoutine(msg string){
+	pause()
+	fmt.Println(msg)
+}
+
+func RunGoRoutineTutorial(){
+	doSomethingGoRoutine("sync1")
+
+	go doSomethingGoRoutine("async1")
+	go doSomethingGoRoutine("async2")
+	go doSomethingGoRoutine("async3")
+
+	doSomethingGoRoutine("sync2")
+
+	time.Sleep(time.Second * 10)
 }
