@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+	"bytes"
 )
 
 const Gpopulation int = 10000
@@ -695,4 +696,16 @@ func RunChannelTimeoutTutorial(){
 }
 
 
-
+func ChannelCloseTutorial(work <-chan string, fin chan<- string){
+	var b bytes.Buffer
+	for{
+		if msg, notClosed := <-work; notClosed{
+			fmt.Printf("%s received...\n", msg)
+			b.WriteString(msg)
+		}else{
+			fmt.Println("channel closed")
+			fin <- b.String()
+			return
+		}
+	}
+}
