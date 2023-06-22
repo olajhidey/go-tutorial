@@ -6,6 +6,6 @@ import (
 
 func main() {
 
-	utils.RunSplitStringExercise()
+	utils.RunChannelTimeoutTutorial()
 
 }

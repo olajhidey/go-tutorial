@@ -551,18 +551,18 @@ func RunPanicRecoverTutorial() {
 	panic("die!")
 }
 
-func pause(){
+func pause() {
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Intn(3)
 	time.Sleep(time.Duration(n) * time.Second)
 }
 
-func doSomethingGoRoutine(msg string){
+func doSomethingGoRoutine(msg string) {
 	pause()
 	fmt.Println(msg)
 }
 
-func RunGoRoutineTutorial(){
+func RunGoRoutineTutorial() {
 	doSomethingGoRoutine("sync1")
 
 	go doSomethingGoRoutine("async1")
@@ -573,3 +573,126 @@ func RunGoRoutineTutorial(){
 
 	time.Sleep(time.Second * 10)
 }
+
+func RunGoChannel() {
+	msgChan := make(chan string)
+
+	go func() {
+		msgChan <- "Cloud"
+		msgChan <- "Academy"
+		msgChan <- "2023"
+	}()
+
+	msg1 := <-msgChan
+	msg2 := <-msgChan
+	msg3 := <-msgChan
+
+	fmt.Println(msg1, msg2, msg3)
+
+}
+
+func RunBufferChannel() {
+	size := 3
+	var buffChan = make(chan int, size)
+
+	// reader
+	go func() {
+		for {
+			_ = <-buffChan
+			time.Sleep(time.Second * 3)
+		}
+	}()
+
+	// Writer
+	writer := func() {
+		for i := 0; i <= 10; i++ {
+			buffChan <- i
+			println(i)
+		}
+	}
+
+	writer()
+}
+
+// write only using channel direction notation
+func in(channel chan<- string, msg string) {
+	channel <- msg
+}
+
+// Read only with channel direction notation
+func out(channel <-chan string) {
+	for {
+		fmt.Println(<-channel)
+	}
+}
+
+func RunChannelDirections() {
+	channel := make(chan string, 1)
+
+	go out(channel)
+
+	for i := 0; i < 10; i++ {
+		in(channel, fmt.Sprintf("cloudacademy - %d", i))
+	}
+
+	time.Sleep(time.Second * 10)
+}
+
+func pauseChannel() {
+	n := rand.Intn(5)
+	time.Sleep(time.Duration(n) * time.Second)
+}
+
+func func1(c chan<- string) {
+	for {
+		pause()
+		c <- "cloud"
+	}
+}
+
+func func2(c chan<- string) {
+	for {
+		pause()
+		c <- "academy"
+	}
+}
+
+// Run select with channels
+func RunChannelSelectTutorial() {
+	rand.Seed(time.Now().Unix())
+
+	chan1 := make(chan string)
+	chan2 := make(chan string)
+
+	go func1(chan1)
+	go func2(chan2)
+
+	for {
+		select {
+		case msg1 := <-chan1:
+			fmt.Println(msg1)
+		case msg2 := <-chan2:
+			fmt.Println(msg2)
+		}
+	}
+
+}
+
+func RunChannelTimeoutTutorial(){
+	channel := make(chan string)
+
+	go func(channel chan string){
+		time.Sleep(2 * time.Second)
+		channel <- "cloudacademy"
+	}(channel)
+
+	select{
+	case msg1 := <-channel:
+		fmt.Println(msg1)
+	case <- time.After(5 * time.Second):
+		fmt.Println("Timeout!")
+	}
+}
+
+
+
