@@ -1,13 +1,13 @@
 package utils
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math"
 	"math/rand"
 	"strings"
 	"time"
-	"bytes"
 )
 
 const Gpopulation int = 10000
@@ -679,33 +679,74 @@ func RunChannelSelectTutorial() {
 
 }
 
-func RunChannelTimeoutTutorial(){
+func RunChannelTimeoutTutorial() {
 	channel := make(chan string)
 
-	go func(channel chan string){
+	go func(channel chan string) {
 		time.Sleep(2 * time.Second)
 		channel <- "cloudacademy"
 	}(channel)
 
-	select{
+	select {
 	case msg1 := <-channel:
 		fmt.Println(msg1)
-	case <- time.After(5 * time.Second):
+	case <-time.After(5 * time.Second):
 		fmt.Println("Timeout!")
 	}
 }
 
-
-func ChannelCloseTutorial(work <-chan string, fin chan<- string){
+func ChannelCloseTutorial(work <-chan string, fin chan<- string) {
 	var b bytes.Buffer
-	for{
-		if msg, notClosed := <-work; notClosed{
+	for {
+		if msg, notClosed := <-work; notClosed {
 			fmt.Printf("%s received...\n", msg)
 			b.WriteString(msg)
-		}else{
+		} else {
 			fmt.Println("channel closed")
 			fin <- b.String()
 			return
 		}
+	}
+}
+
+func RuncChannelCloseTutorial(){
+	
+	work := make(chan string, 3)
+	fin := make(chan string)
+
+	go ChannelCloseTutorial(work, fin)
+
+	word := "cloudacademy"
+
+	for j := 0; j < len(word); j++ {
+		letter := string(word[j])
+		work <- letter
+		fmt.Printf("%s sent ...\n", letter)
+	}
+
+	close(work)
+
+	fmt.Printf("result: %s", <-fin)
+}
+
+func squares() func() int {
+	var x int
+	return func() int {
+		x++
+		return x * x
+	}
+}
+
+func RunChannelRangeTutorial() {
+	f := squares()
+	squares := make(chan int, 20)
+	for i := f(); i <= 100; i = f() {
+		squares <- i
+	}
+
+	close(squares)
+
+	for elem := range squares {
+		fmt.Println(elem)
 	}
 }
