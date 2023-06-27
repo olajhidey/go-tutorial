@@ -709,8 +709,8 @@ func ChannelCloseTutorial(work <-chan string, fin chan<- string) {
 	}
 }
 
-func RuncChannelCloseTutorial(){
-	
+func RuncChannelCloseTutorial() {
+
 	work := make(chan string, 3)
 	fin := make(chan string)
 
@@ -748,5 +748,80 @@ func RunChannelRangeTutorial() {
 
 	for elem := range squares {
 		fmt.Println(elem)
+	}
+}
+
+type cloud interface {
+	launch() string
+}
+
+type aws struct {
+	computeSvcName string
+}
+
+type azure struct {
+	computeSvcName string
+}
+
+func (cloud aws) launch() string {
+	return fmt.Sprintf("%s launching instance..", cloud.computeSvcName)
+}
+
+func (cloud azure) launch() string {
+	return fmt.Sprintf("%s launching instance..", cloud.computeSvcName)
+}
+
+func compute(cloud interface{}) {
+	switch cloudPlatform := cloud.(type) {
+	case aws:
+		aws := cloud.(aws) // casting
+		fmt.Printf("AWS: %s -> %s\n", aws, cloudPlatform.launch())
+		break
+	case azure:
+		azure := cloud.(azure)
+		fmt.Printf("Azure: %s -> %s\n", azure, cloudPlatform.launch())
+		break
+	}
+
+}
+
+func RunTypeSwitchTutorial() {
+	var clouds []cloud = []cloud{
+		aws{"ec2"}, azure{"vm"},
+	}
+
+	for _, cloud := range clouds {
+		compute(cloud)
+	}
+}
+
+type company struct {
+	name string
+}
+
+func RunEmptyInterfaceTutorial() {
+	var a, b, c, d interface{}
+
+	a = 43
+	b = "blash"
+	c = true
+	d = company{"cloudacademy"}
+
+	fmt.Println(d)
+
+	func(list ...interface{}) {
+		for _, v := range list {
+			fmt.Printf("%v, %T\n", v, v)
+		}
+	}(a, b, c, d)
+}
+
+func RunTypeAAssertionTutorial(){
+	var x interface{} = company{"CloudAcademy"}
+	c1 := x.(company)
+	fmt.Println(c1)
+
+	if c2, ok := x.(company); ok {
+		fmt.Println(c2, ok)
 	}
 }
